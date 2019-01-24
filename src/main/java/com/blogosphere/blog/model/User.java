@@ -19,23 +19,24 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @Entity // If hibernate.ddl-auto=create, @Entity will suggest Hibernate to make a table
 		// out of this class
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "unique_users_email_idx")})
+@Table(name = "user", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "unique_users_email_idx")})
 public class User extends BaseEntity {
-	@NotBlank(message = "name cannot be blank")
+//	@NotBlank(message = "name cannot be blank")
 //	@SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE)
 	@Column(nullable=false, length = 100)
-	@Size(min = 1, max = 100)
+//	@Size(min = 1, max = 100)
 	private String name;
 
-	@NotBlank(message = "Please provide a password")
+//	@NotBlank(message = "Please provide a password")
+	@Column(nullable=false)
 	private String passwordHash;
 
-//	@Column(unique = true)
-	@NotBlank(message = "email cannot be blank")
-	@Email(message = "invalid format")
+	@Column(nullable=false)
+//	@NotBlank(message = "email cannot be blank")
+//	@Email(message = "invalid format")
 	private String email;
 
-	@NotBlank(message = "Please provide a name for your space")
+//	@NotBlank(message = "Please provide a name for your space")
 //	@SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE)
 	@Column(nullable=false, length = 30)
 	@Size(min = 2, max = 30)

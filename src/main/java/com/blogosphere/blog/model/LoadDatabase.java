@@ -30,14 +30,14 @@ class LoadDatabase {
 			
 			Post post1 = new Post();
 			post1.setAuthor(user1);
-			post1.setDesciption("creates the property traversal x.address.zipCode. The resolution algorithm starts with interpreting the entire part");
+			post1.setDescription("creates the property traversal x.address.zipCode. The resolution algorithm starts with interpreting the entire part");
 			post1.setTitle("Spring JPA Docs");
 			
 			postRepository.save(post1);
 
 			Post post2 = new Post();
 			post2.setAuthor(user1);
-			post2.setDesciption("Although this should work for most cases, it is possible for the algorithm to select the wrong property.");
+			post2.setDescription("Although this should work for most cases, it is possible for the algorithm to select the wrong property.");
 			post2.setTitle("Spring Data Hibernate Docs");
 			
 			postRepository.save(post2);

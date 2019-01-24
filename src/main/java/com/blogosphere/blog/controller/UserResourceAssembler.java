@@ -7,13 +7,13 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;
 
-import com.blogosphere.blog.model.User;
+import com.blogosphere.blog.dto.UserDetailDto;
 
 @Component
-public class UserResourceAssembler implements ResourceAssembler<User, Resource<User>> {
+public class UserResourceAssembler implements ResourceAssembler<UserDetailDto, Resource<UserDetailDto>> {
 
 	@Override
-	public Resource<User> toResource(User user) {
+	public Resource<UserDetailDto> toResource(UserDetailDto user) {
 		return new Resource<>(user,
 			linkTo(methodOn(UserController.class).getUser(user.getId())).withSelfRel(),
 			linkTo(methodOn(UserController.class).getAllUsers()).withRel("users"));

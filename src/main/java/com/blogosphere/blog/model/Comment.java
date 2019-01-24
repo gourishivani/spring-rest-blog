@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -16,8 +17,8 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class Comment extends BaseEntity {
 	@Column(nullable = false, length=300)
-	@NotNull
-//	@SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE) // We are only allowing plain text
+	@NotBlank(message = "Please provide some content for your comment")
+	@SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE) // We are only allowing plain text
 	@Size(min = 2, max = 300)
 	private String content;
 	
