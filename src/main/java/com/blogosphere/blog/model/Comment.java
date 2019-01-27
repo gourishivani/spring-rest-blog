@@ -2,6 +2,7 @@ package com.blogosphere.blog.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
@@ -22,12 +23,12 @@ public class Comment extends BaseEntity {
 	@Size(min = 2, max = 300)
 	private String content;
 	
-	@ManyToOne
+	@ManyToOne 
 	@JoinColumn(name="commentor_id", referencedColumnName="id", nullable=false)
 	@NotNull
 	private User commentor;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY, optional=false)
 	@JoinColumn(name="post_id", referencedColumnName="id", nullable=false)
 	@NotNull
 	private Post post;

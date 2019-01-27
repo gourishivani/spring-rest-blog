@@ -11,6 +11,7 @@ import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ import com.blogosphere.blog.model.User;
 
 @RequestMapping(path = "/comments")
 @RestController
+@CrossOrigin(origins="http://localhost:4200")
 public class CommentController {
 	@Autowired
 	public CommentService commentService;
@@ -44,6 +46,7 @@ public class CommentController {
 	
 	@PostMapping
 	public ResponseEntity<?> createComment(@RequestBody @Valid CommentCreateDto commentDto) throws URISyntaxException, ParseException {
+		System.out.println("Comment = " + commentDto);
 		Comment comment = convertToEntity(commentDto);
 		Comment created = commentService.createComment(comment);
 		Resource<CommentDetailDto> resource = commentAssembler.toResource(convertToDto(created));
