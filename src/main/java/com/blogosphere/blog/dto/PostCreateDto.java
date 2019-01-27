@@ -1,6 +1,7 @@
 package com.blogosphere.blog.dto;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.SafeHtml;
@@ -20,5 +21,6 @@ public class PostCreateDto {
 	private String description;
 	
 //	private UserDetailDto author;
+	@NotNull
 	private Long authorId;
 }

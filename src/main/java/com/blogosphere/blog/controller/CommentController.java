@@ -46,7 +46,6 @@ public class CommentController {
 	
 	@PostMapping
 	public ResponseEntity<?> createComment(@RequestBody @Valid CommentCreateDto commentDto) throws URISyntaxException, ParseException {
-		System.out.println("Comment = " + commentDto);
 		Comment comment = convertToEntity(commentDto);
 		Comment created = commentService.createComment(comment);
 		Resource<CommentDetailDto> resource = commentAssembler.toResource(convertToDto(created));

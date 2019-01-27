@@ -6,7 +6,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.blogosphere.blog.dao.CommentRepository;
@@ -24,8 +24,8 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public List<Comment> findAllByPost(Long postId, Pageable pageable) {
-		return this.commentRepository.findByPost_Id(postId);
+	public List<Comment> findAllByPost(Long postId, Sort sort) {
+		return this.commentRepository.findByPost_Id(postId, sort);
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +71,8 @@ public class UserController {
 //        @PathVariable("size") int size, 
 //        @PathVariable("sortDir") String sortDir, 
 //        @PathVariable("sort") String sort
-		List<Resource<UserDetailDto>> users = userService.findAll(new PageRequest(1, 100)).stream().map(user -> convertToDto(user)).map(userAssembler::toResource)
+		Sort sort = new Sort(Sort.Direction.DESC, "created");
+		List<Resource<UserDetailDto>> users = userService.findAll(sort).stream().map(user -> convertToDto(user)).map(userAssembler::toResource)
 				.collect(Collectors.toList());
 		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
 		return new Resources<>(users, linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel());

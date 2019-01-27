@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +63,8 @@ public class PostController {
 	
 	@GetMapping(path = "/{postId}/comments")
 	public Resources<Resource<CommentDetailDto>> getAllComments(@PathVariable Long postId) {
-		List<Resource<CommentDetailDto>> employees = commentService.findAllByPost(postId, new PageRequest(1, 100)).stream()
+		Sort sort = new Sort(Sort.Direction.DESC, "created");
+		List<Resource<CommentDetailDto>> employees = commentService.findAllByPost(postId, sort).stream()
 				.map(comment-> convertToDto(comment)).map(commentAssembler::toResource)
 				.collect(Collectors.toList());
 		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
