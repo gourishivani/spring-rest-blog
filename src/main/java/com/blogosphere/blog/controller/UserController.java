@@ -88,8 +88,9 @@ public class UserController {
 	@GetMapping(path = "/{userId}/posts")
 	public Resources<Resource<PostDetailDto>> findAllPostsForUser(@PathVariable Long userId) {
 
+		Sort sort = new Sort(Sort.Direction.DESC, "created");
 		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
-		List<Resource<PostDetailDto>> userPosts = postService.findAllByAuthor(userId, new PageRequest(1, 100)).stream().map(entity -> convertToDto(entity)).map(postAssembler::toResource)
+		List<Resource<PostDetailDto>> userPosts = postService.findAllByAuthor(userId, sort).stream().map(entity -> convertToDto(entity)).map(postAssembler::toResource)
 				.collect(Collectors.toList());
 		return new Resources<>(userPosts, linkTo(methodOn(UserController.class).findAllPostsForUser(userId)).withSelfRel());
 	}

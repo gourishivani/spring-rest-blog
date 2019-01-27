@@ -6,7 +6,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.blogosphere.blog.dao.PostRepository;
@@ -24,8 +24,8 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public List<Post> findAllByAuthor(Long authorId, Pageable pageable) {
-		return this.postRepository.findByAuthor_Id(authorId);
+	public List<Post> findAllByAuthor(Long authorId, Sort sort) {
+		return this.postRepository.findByAuthor_Id(authorId, sort);
 	}
 
 	@Override
