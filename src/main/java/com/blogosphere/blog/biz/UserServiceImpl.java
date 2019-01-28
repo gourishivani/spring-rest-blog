@@ -38,13 +38,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean authenticate(String email, String passwordHash) {
-		return true;
+	public User findByEmail(String email) {
+		return this.userRepository.findByEmail(email);
 	}
 
-	@Override
-	public boolean unAuthenticate(String email, String passwordHash) {
-		// TODO Auto-generated method stub
-		return true;
-	}
 }

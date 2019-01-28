@@ -7,4 +7,6 @@ import com.blogosphere.blog.model.User;
 // Spring will provide implementation for all the methods defined in the JpaRepository 
 public interface UserRepository extends JpaRepository<User, Long> {
 
+	User findByEmail(String email);
+
 }

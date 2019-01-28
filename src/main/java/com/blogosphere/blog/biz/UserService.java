@@ -21,7 +21,6 @@ public interface UserService {
 	
 	public Optional<User> find(Long id);
 	
-	public boolean authenticate(String email, String passwordHash);
+	public User findByEmail(String email);
 	
-	public boolean unAuthenticate(String email, String passwordHash);
 }

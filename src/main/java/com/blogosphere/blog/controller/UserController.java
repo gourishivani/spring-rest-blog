@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,22 +56,28 @@ public class UserController {
 
 	@Autowired
     private ModelMapper modelMapper;
- 
+
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	/**
+	 * In the spirit of being Restful, this path is not named as /register.
+	 * @param userDto
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws ParseException
+	 */
 	@PostMapping
 	public ResponseEntity<?> createUser(@RequestBody @Valid UserCreateDto userDto) throws URISyntaxException, ParseException {
 		User user = convertToEntity(userDto);
+		user.setPasswordHash(bCryptPasswordEncoder.encode(user.getPasswordHash()));
 		User created = userService.createUser(user);
 		Resource<UserDetailDto> resource = userAssembler.toResource(convertToDto(created));
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
 	@GetMapping
-//	Goes inside method @RequestParam String sort, @RequestParam String order
 	public Resources<Resource<UserDetailDto>> getAllUsers() {
-//		@PathVariable("page") int page,
-//        @PathVariable("size") int size, 
-//        @PathVariable("sortDir") String sortDir, 
-//        @PathVariable("sort") String sort
 		Sort sort = new Sort(Sort.Direction.DESC, "created");
 		List<Resource<UserDetailDto>> users = userService.findAll(sort).stream().map(user -> convertToDto(user)).map(userAssembler::toResource)
 				.collect(Collectors.toList());
@@ -97,8 +104,6 @@ public class UserController {
 
 	private UserDetailDto convertToDto(User entity) {
 		UserDetailDto dto = modelMapper.map(entity, UserDetailDto.class);
-//	    postDto.setSubmissionDate(user.getSubmissionDate(), 
-//	        userService.getCurrentUser().getPreference().getTimezone());
 	    return dto;
 	}
 	
@@ -109,13 +114,6 @@ public class UserController {
 	
 	private PostDetailDto convertToDto(Post entity) {
 		PostDetailDto dto = modelMapper.map(entity, PostDetailDto.class);
-//	    postDto.setSubmissionDate(user.getSubmissionDate(), 
-//	        userService.getCurrentUser().getPreference().getTimezone());
 		return dto;
-	}
-	
-	private Post convertToEntity(PostCreateDto dto) throws ParseException {
-		Post entity = modelMapper.map(dto, Post.class);
-		return entity;
 	}
 }
