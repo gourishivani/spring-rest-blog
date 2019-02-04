@@ -21,37 +21,37 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class LoadDatabase {
 	
+	// TO DISABLE this, comment out the @Bean declaration
 	@Bean
 	CommandLineRunner initDatabase(UserRepository repository, PostRepository postRepository, CommentRepository commentRepository) {
 		return args -> {
-			// Original Password: test123
-//			User user1 = repository.save(KnownObjects.knownUser1()); 
-
-			// Original Password: tester
-//			User user2 = repository.save(KnownObjects.knownUser2());
-//			log.info("Preloading User " + user1);
-//			log.info("Preloading User " + user2);
 			
-//			Post post1 = KnownObjects.knownPost1(user1);
-//			postRepository.save(post1);
-//
-//			Post post2 = KnownObjects.knownPost1(user1);
-//			postRepository.save(post2);
-//			log.info("Preloading Post " + post1);
-//			log.info("Preloading Post " + post2);
-//			
-//			Comment comment1 = KnownObjects.knownComment1(post1, user2);
-//			commentRepository.save(comment1);
-//			
-//			Comment comment2 = KnownObjects.knownComment1(post1, user1);
-//			commentRepository.save(comment2);
-//			
-//			
-//			Comment comment3 = KnownObjects.knownComment1(post1, user1);
-//			commentRepository.save(comment3);
-//			
-//			log.info("Preloading Comment " + comment1);
-//			log.info("Preloading Comment " + comment2);
+			User user1 = repository.save(KnownObjects.knownUser1());// Original Password: test123 
+
+			User user2 = repository.save(KnownObjects.knownUser2()); // Original Password: tester
+			log.info("Preloading User " + user1);
+			log.info("Preloading User " + user2);
+			
+			Post post1 = KnownObjects.knownPost1(user1);
+			postRepository.save(post1);
+
+			Post post2 = KnownObjects.knownPost1(user1);
+			postRepository.save(post2);
+			log.info("Preloading Post " + post1);
+			log.info("Preloading Post " + post2);
+			
+			Comment comment1 = KnownObjects.knownComment1(post1, user2);
+			commentRepository.save(comment1);
+			
+			Comment comment2 = KnownObjects.knownComment1(post1, user1);
+			commentRepository.save(comment2);
+			
+			
+			Comment comment3 = KnownObjects.knownComment1(post1, user1);
+			commentRepository.save(comment3);
+			
+			log.info("Preloading Comment " + comment1);
+			log.info("Preloading Comment " + comment2);
 		};
 	}
 

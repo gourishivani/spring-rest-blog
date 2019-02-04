@@ -2,7 +2,6 @@ package com.blogosphere.blog.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.HttpRetryException;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
