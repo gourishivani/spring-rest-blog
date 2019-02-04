@@ -90,7 +90,7 @@ I am using DTOs to explicitly define Resource representation. This helps to sepa
 
 ## Improvements
 
-1. All the issues can be found in this link: [Issue-Links](https://github.com/codecentric/springboot-sample-app/blob/master/LICENSE) file.
+1. All the issues can be found in this link: [Issue-Links](https://github.com/gourishivani/spring-rest-blog/issues) file.
 2. I have not enabled pagination. Incuding this would be trivial with Spring.
 3. Externalized Configuration management is not implemented. (prod,dev, local etc)
 4. Dependency tree could be further trimmed down. Due to time constraints, I have let the defaults be.
