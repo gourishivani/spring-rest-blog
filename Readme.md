@@ -54,6 +54,8 @@ A user need not be logged in to access swagger. Please take a look at the swagge
 
 ## Project Structure
 Source code can be found under `src/main/java`. There are packages for Controller, Service and DAO. DTOs are used to de-serialize/serialize data from Client to Rest Service. Entities are located under models package. Security related files are under jwt packages. There is also a package called `knownobjects` that is shared between source and tests. This is kept in source so that data can be easily loaded during application startup.
+![PackageStructure](screenshots/Backend-PackageStructure.png?raw=true "PackageStructure")
+
 
 ## Assumptions
 * DB access should be done in a configurable way. Right now, the credentials are just hard coded based on the user created by code during startup. In reality, the credentials will be specific to a certain environment and they could be loaded from Secret Server.
