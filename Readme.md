@@ -105,9 +105,9 @@ I am using DTOs to explicitly define Resource representation. This helps to sepa
 References:
 1. MDC #https://github.com/Verdoso/GreenSummer/blob/master/summer-demo/src/main/resources/log4j2.xml
 2. JWT: 
+* Udemy Courses: JWT and the application in general was heavily influenced by "Go Full Stack with Spring Boot and Angular 7" course
 * https://g00glen00b.be/spring-boot-jwt/
 * https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/
-* Udemy Courses
 3. https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application
 4. https://stackoverflow.com/questions/17874688/what-is-a-good-strategy-for-converting-jpa-entities-into-restful-resources
 5. https://www.baeldung.com/exception-handling-for-rest-with-spring
