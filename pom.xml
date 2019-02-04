@@ -29,12 +29,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
@@ -67,12 +67,15 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Start: Documentation -->
+		<!-- <dependency> <groupId>io.springfox</groupId> <artifactId>springfox-swagger2</artifactId> 
+			<version>2.4.0</version> </dependency> <dependency> <groupId>io.springfox</groupId> 
+			<artifactId>springfox-swagger-ui</artifactId> <version>2.4.0</version> </dependency> -->
+		<!-- End: Documentation -->
+
 		<!-- This will help ease the efforts to write integration tests -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
+		<!-- <dependency> <groupId>com.h2database</groupId> <artifactId>h2</artifactId> 
+			<scope>test</scope> </dependency> -->
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -89,11 +92,8 @@
 			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.restdocs</groupId>
-			<artifactId>spring-restdocs-mockmvc</artifactId>
-			<scope>test</scope>
-		</dependency>
+		<!-- <dependency> <groupId>org.springframework.restdocs</groupId> <artifactId>spring-restdocs-mockmvc</artifactId> 
+			<scope>test</scope> </dependency> -->
 
 		<dependency>
 			<groupId>org.jsoup</groupId>
@@ -101,15 +101,29 @@
 			<version>1.11.2</version>
 		</dependency>
 
-		<!-- 
-		To bind Entity to DTO 
-		-->
+		<!-- To bind Entity to DTO -->
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>2.3.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

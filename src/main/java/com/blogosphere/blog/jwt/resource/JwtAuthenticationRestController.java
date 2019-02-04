@@ -3,6 +3,7 @@ package com.blogosphere.blog.jwt.resource;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,8 +26,14 @@ import com.blogosphere.blog.dto.UserDetailDto;
 import com.blogosphere.blog.jwt.JwtTokenUtil;
 import com.blogosphere.blog.jwt.JwtUserDetails;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
+@Api(value="/authenticate")
 public class JwtAuthenticationRestController {
 
 	@Value("${jwt.http.request.header}")
@@ -41,8 +48,16 @@ public class JwtAuthenticationRestController {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@ApiOperation(value = "Authenticate User", tags= {"authenticate"}, response = ResponseEntity.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfull"),
+	        @ApiResponse(code = 400, message = "Validation check failed"),
+	        @ApiResponse(code = 401, message = "You are not authorized"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")})
 	@RequestMapping(value = "${jwt.get.token.uri}", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtTokenRequest authenticationRequest)
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid JwtTokenRequest authenticationRequest)
 			throws AuthenticationException {
 
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
@@ -51,7 +66,7 @@ public class JwtAuthenticationRestController {
 
 		final String token = jwtTokenUtil.generateToken(userDetails);
 
-		return ResponseEntity.ok(new JwtTokenResponse(toUserDetailDto((JwtUserDetails) userDetails), token));
+		return ResponseEntity.ok(new JwtTokenResponse(token, toUserDetailDto((JwtUserDetails) userDetails)));
 	}
 
 	private UserDetailDto toUserDetailDto(JwtUserDetails jwtUser) {
@@ -63,6 +78,14 @@ public class JwtAuthenticationRestController {
 		return user;
 	}
 
+	@ApiOperation(value = "Refresh Auth Token for User", tags= {"authenticate"}, response = ResponseEntity.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfull"),
+	        @ApiResponse(code = 400, message = "Validation check failed"),
+	        @ApiResponse(code = 401, message = "You are not authorized"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")})
 	@RequestMapping(value = "${jwt.refresh.token.uri}", method = RequestMethod.GET)
 	public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) {
 		String authToken = request.getHeader(tokenHeader);
@@ -72,7 +95,7 @@ public class JwtAuthenticationRestController {
 
 		if (jwtTokenUtil.canTokenBeRefreshed(token)) {
 			String refreshedToken = jwtTokenUtil.refreshToken(token);
-			return ResponseEntity.ok(new JwtTokenResponse(toUserDetailDto((JwtUserDetails) user), refreshedToken));
+			return ResponseEntity.ok(new JwtTokenResponse(refreshedToken, toUserDetailDto((JwtUserDetails) user)));
 		} else {
 			return ResponseEntity.badRequest().body(null);
 		}

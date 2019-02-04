@@ -3,6 +3,8 @@ package com.blogosphere.blog.biz;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,8 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Override
+	@Transactional
 	public User createUser(User user) {
 		return this.userRepository.save(user);
 	}
@@ -41,5 +45,4 @@ public class UserServiceImpl implements UserService {
 	public User findByEmail(String email) {
 		return this.userRepository.findByEmail(email);
 	}
-
 }

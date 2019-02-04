@@ -16,6 +16,6 @@ public class UserResourceAssembler implements ResourceAssembler<UserDetailDto, R
 	public Resource<UserDetailDto> toResource(UserDetailDto user) {
 		return new Resource<>(user,
 			linkTo(methodOn(UserController.class).getUser(user.getId())).withSelfRel(),
-			linkTo(methodOn(UserController.class).getAllUsers()).withRel("users"));
+			linkTo(methodOn(UserController.class).getAllUsersRestful()).withRel("users"));
 	}
 }

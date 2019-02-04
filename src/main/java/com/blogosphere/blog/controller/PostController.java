@@ -11,12 +11,11 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,13 +30,23 @@ import com.blogosphere.blog.biz.PostService;
 import com.blogosphere.blog.dto.CommentDetailDto;
 import com.blogosphere.blog.dto.PostCreateDto;
 import com.blogosphere.blog.dto.PostDetailDto;
+import com.blogosphere.blog.dto.PostMapper;
+import com.blogosphere.blog.dto.UserDetailDto;
 import com.blogosphere.blog.exception.EntityNotFoundException;
-import com.blogosphere.blog.model.Comment;
+import com.blogosphere.blog.jwt.AuthenticatedUser;
+import com.blogosphere.blog.jwt.JwtUserDetails;
 import com.blogosphere.blog.model.Post;
+import com.blogosphere.blog.model.User;
 
-@RequestMapping(path = "/posts")
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+//@RequestMapping(path = "/posts")
 @CrossOrigin(origins="http://localhost:4200")
 @RestController
+@Api(value="/posts")
 public class PostController {
 	
 	@Autowired
@@ -53,45 +62,74 @@ public class PostController {
 	private PostResourceAssembler postAssembler;
 
 	@Autowired
-    private ModelMapper modelMapper;
+    private PostMapper modelMapper;
  
-	@GetMapping(path = "/{postId}")
+	@ApiOperation(value = "View a post detail",tags= {"posts"},
+			response = Resource.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved resource"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")
+	})
+	@GetMapping(path = "/posts/{postId}")
 	public Resource<PostDetailDto> getPost(@PathVariable Long postId) {
 		Post post = postService.find(postId).orElseThrow(() -> new EntityNotFoundException(postId, Post.class));
-		return postAssembler.toResource(convertToDto(post));
+		return postAssembler.toResource(this.modelMapper.convertToDto(post));
 	}
 	
-	@GetMapping(path = "/{postId}/comments")
-	public Resources<Resource<CommentDetailDto>> getAllComments(@PathVariable Long postId) {
-		Sort sort = new Sort(Sort.Direction.DESC, "created");
-		List<Resource<CommentDetailDto>> employees = commentService.findAllByPost(postId, sort).stream()
-				.map(comment-> convertToDto(comment)).map(commentAssembler::toResource)
-				.collect(Collectors.toList());
-		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
-		return new Resources<>(employees, linkTo(methodOn(PostController.class).getAllComments(postId)).withSelfRel());
-	}
-	
-	@PostMapping
+	@ApiOperation(value = "Create post", tags= {"posts"}, response = ResponseEntity.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 201, message = "Successfully created"),
+	        @ApiResponse(code = 400, message = "Validation check failed"),
+	        @ApiResponse(code = 401, message = "You are not authorized create the resource"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse(code = 409, message = "Duplicate entry for email. Email already exists"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")
+	})
+	@PostMapping("/posts")
 	public ResponseEntity<?> createPost(@RequestBody @Valid PostCreateDto dto) throws URISyntaxException, ParseException {
-		Post post = convertToEntity(dto);
+		Post post = this.modelMapper.convertToEntity(dto);
+		JwtUserDetails user = AuthenticatedUser.getAuthenticatedUser();
+		post.setAuthor(new User(user.getId()));
 		Post created = postService.createPost(post);
-		Resource<PostDetailDto> resource = postAssembler.toResource(convertToDto(created));
+		Resource<PostDetailDto> resource = postAssembler.toResource(this.modelMapper.convertToDto(created));
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 	
-	private PostDetailDto convertToDto(Post entity) {
-		PostDetailDto dto = modelMapper.map(entity, PostDetailDto.class);
-		return dto;
+	@ApiOperation(value = "View ALL posts for a given user",tags= {"users"},
+			response = Resources.class,
+			notes="No pagination support yet, The post list is reverse chronologically sorted by date created")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved list"),
+	        @ApiResponse(code = 500, message = "Server error"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
+	})
+	@GetMapping(path = "/users/{userId}/posts")
+	public ResponseEntity<List<PostDetailDto>> findAllPostsForUser(@PathVariable Long userId) {
+		Sort sort = new Sort(Sort.Direction.DESC, "created");
+		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
+		List<PostDetailDto> userPosts = postService.findAllByAuthor(userId, sort).stream().map(entity -> this.modelMapper.convertToDto(entity)).
+				collect(Collectors.toList());
+		return new ResponseEntity<>(userPosts, HttpStatus.OK);
 	}
 	
-	private Post convertToEntity(PostCreateDto dto) throws ParseException {
-		Post entity = modelMapper.map(dto, Post.class);
-		return entity;
+	@ApiOperation(value = "View a Restful/HATEOAS compliant list of posts for a given user",tags= {"users"},
+			response = Resources.class,
+			notes="Demo Notes: The resource URL is not compliant with Restful API definitions. However, it is here just to demonstrate HATEOAS compliant restful list request."
+					+ "Also, this will not be used by the front end to keep things simple")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully retrieved list"),
+			@ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
+	})
+	@GetMapping(path = "/users/{userId}/posts/restful")
+	public Resources<Resource<PostDetailDto>> findAllPostsForUserRestful(@PathVariable Long userId) {
+		
+		Sort sort = new Sort(Sort.Direction.DESC, "created");
+		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
+		List<Resource<PostDetailDto>> userPosts = postService.findAllByAuthor(userId, sort).stream().map(entity -> this.modelMapper.convertToDto(entity)).map(postAssembler::toResource)
+				.collect(Collectors.toList());
+		return new Resources<>(userPosts, linkTo(methodOn(PostController.class).findAllPostsForUserRestful(userId)).withSelfRel());
 	}
-	
-	private CommentDetailDto convertToDto(Comment entity) {
-		CommentDetailDto dto = modelMapper.map(entity, CommentDetailDto.class);
-		return dto;
-	}
-	
 }

@@ -2,12 +2,17 @@ package com.blogosphere.blog.jwt.resource;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotBlank;
+
 public class  JwtTokenRequest implements Serializable {
   
   private static final long serialVersionUID = -5616176897013108345L;
 
+  @NotBlank(message="Please enter a username")
   private String username;
-    private String password;
+  
+  @NotBlank(message="Please enter a password")
+  private String password;
 
     public JwtTokenRequest() {
         super();

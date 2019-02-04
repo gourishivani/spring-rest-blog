@@ -1,7 +1,3 @@
-CREATE TABLE `user` (
-  `id` bigint(20) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+INSERT INTO user (id, name, created, email, password_hash, space_name) VALUES (3, 'Test1', now(), 'test1@example.com', '$2a$10$xsiDSyv7rJRBHDYJ2e8oyOeN5FEC8DGr.IrLBv.6WZnejXLySGw9e', 'Tester 1 world');
+
+INSERT INTO user (id, name, created, email, password_hash, space_name) VALUES (4, 'Test2', now(), 'test2@example.com', '$2a$10$xsiDSyv7rJRBHDYJ2e8oyOeN5FEC8DGr.IrLBv.6WZnejXLySGw9e', 'Tester 2 world');

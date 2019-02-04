@@ -42,15 +42,18 @@ public class User extends BaseEntity {
 	@Size(min = 2, max = 30)
 	private String spaceName;
 
-//	private List<BlogPost> posts = new LinkedList<>();
-
 	public User(String name, String email, String passwordHash, String spaceName) {
 		this.name = name;
 		this.email = email;
 		this.passwordHash = passwordHash;
 		this.spaceName = spaceName;
 	}
+	
+	public User(Long id) {
+		setId(id);
+	}
 
+	
 	public User() {
 	}
 }

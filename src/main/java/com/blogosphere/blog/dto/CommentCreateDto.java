@@ -6,20 +6,25 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.SafeHtml;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CommentCreateDto {
-	@NotBlank(message = "Please provide some content for your comment")
+	
+	public static final String MISSING_CONTENT_MESSAGE = "Please provide some content for your comment";
+	public static final String MISSING_POSTID_MESSAGE = "Please provide postId";
+	
+	public static final String BADFORMAT_CONTENT_MESSAGE = "Please provide a title between 2 to 300 characters";
+	
+	@NotBlank(message = MISSING_CONTENT_MESSAGE)
 	@SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE) // We are only allowing plain text
-	@Size(message="Please provide a title between 2 to 300 characters",min = 2, max = 300)
+	@Size(message=BADFORMAT_CONTENT_MESSAGE, min = 2, max = 300)
 	private String content;
 	
-	@NotNull(message="Please provide commentorId")
-//	private Long commentorId; // ModelMapper has issues mapping this to the id.
-	private UserDetailDto commentor;
-	
-	@NotNull(message="Please provide postId")
-//	private Long postId;
+	@NotNull(message=MISSING_POSTID_MESSAGE)
 	private PostDetailDto post;
 }

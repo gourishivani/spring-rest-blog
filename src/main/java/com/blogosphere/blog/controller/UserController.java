@@ -13,10 +13,10 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,21 +25,28 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.blogosphere.blog.biz.PostService;
 import com.blogosphere.blog.biz.UserService;
-import com.blogosphere.blog.dto.PostCreateDto;
 import com.blogosphere.blog.dto.PostDetailDto;
 import com.blogosphere.blog.dto.UserCreateDto;
 import com.blogosphere.blog.dto.UserDetailDto;
+import com.blogosphere.blog.dto.UserMapper;
 import com.blogosphere.blog.exception.EntityNotFoundException;
 import com.blogosphere.blog.model.Post;
 import com.blogosphere.blog.model.User;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @CrossOrigin(origins="http://localhost:4200")
-@RequestMapping(path = "/users")
+//@RequestMapping(path = "/users")
+@Api(value="/users")
 public class UserController {
 
 	@Autowired
@@ -55,7 +62,7 @@ public class UserController {
 	private PostResourceAssembler postAssembler;
 
 	@Autowired
-    private ModelMapper modelMapper;
+	private UserMapper userMapper;
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -67,53 +74,71 @@ public class UserController {
 	 * @throws URISyntaxException
 	 * @throws ParseException
 	 */
-	@PostMapping
+	@ApiOperation(value = "Create in the system", tags= {"users"}, response = ResponseEntity.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 201, message = "Successfully created"),
+	        @ApiResponse(code = 400, message = "Validation check failed"),
+	        @ApiResponse(code = 401, message = "You are not authorized to create the resource"),
+	        @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse(code = 409, message = "Duplicate entry for email. Email already exists"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")
+	})
+	@PostMapping("/users")
 	public ResponseEntity<?> createUser(@RequestBody @Valid UserCreateDto userDto) throws URISyntaxException, ParseException {
-		User user = convertToEntity(userDto);
+		User user = this.userMapper.convertToEntity(userDto);
 		user.setPasswordHash(bCryptPasswordEncoder.encode(user.getPasswordHash()));
 		User created = userService.createUser(user);
-		Resource<UserDetailDto> resource = userAssembler.toResource(convertToDto(created));
+		Resource<UserDetailDto> resource = userAssembler.toResource(this.userMapper.convertToDto(created));
 		return ResponseEntity.created(new URI(resource.getId().expand().getHref())).body(resource);
 	}
 
-	@GetMapping
-	public Resources<Resource<UserDetailDto>> getAllUsers() {
+	@ApiOperation(value = "View a list of users in the system",
+			response = Resources.class, tags= {"users"},
+			notes="No pagination support yet, The user list is reverse chronologically sorted by date created")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved list"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")
+	})
+	@GetMapping("/users")
+	public ResponseEntity<List<UserDetailDto>> getAllUsers() {
 		Sort sort = new Sort(Sort.Direction.DESC, "created");
-		List<Resource<UserDetailDto>> users = userService.findAll(sort).stream().map(user -> convertToDto(user)).map(userAssembler::toResource)
-				.collect(Collectors.toList());
-		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
-		return new Resources<>(users, linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel());
+		List<UserDetailDto> users = userService.findAll(sort).stream().map(user -> this.userMapper.convertToDto(user)).collect(Collectors.toList());
+		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
-
-	@GetMapping("/{userId}")
+	
+	@ApiOperation(value = "View a Restful/HATEOAS compliant list of users in the system",
+			response = Resources.class, tags= {"users"},
+			notes="Demo Notes: The resource URL is not compliant with Restful API definitions. However, it is here just to demonstrate HATEOAS compliant restful list request."
+					+ "Also, this will not be used by the front end to keep things simple")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved list"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")
+	})
+	@GetMapping("/users/restful")
+	public Resources<Resource<UserDetailDto>> getAllUsersRestful() {
+		Sort sort = new Sort(Sort.Direction.DESC, "created");
+		List<Resource<UserDetailDto>> users = userService.findAll(sort).stream().map(user -> this.userMapper.convertToDto(user)).map(userAssembler::toResource)
+				.collect(Collectors.toList());
+		/**
+		 *  NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
+		 */
+		
+		return new Resources<>(users, linkTo(methodOn(UserController.class).getAllUsersRestful()).withSelfRel());
+	}
+	
+	@ApiOperation(value = "View a user detail",tags= {"users"},
+			response = Resource.class)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successfully retrieved resource"),
+	        @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+	        @ApiResponse(code = 500, message = "Server error")
+	})
+	@GetMapping("/users/{userId}")
 	Resource<UserDetailDto> getUser(@PathVariable Long userId) {
 		User user = userService.find(userId).orElseThrow(() -> new EntityNotFoundException(userId, User.class));
-		return userAssembler.toResource(convertToDto(user));
-	}
-	
-	// Post related
-	@GetMapping(path = "/{userId}/posts")
-	public Resources<Resource<PostDetailDto>> findAllPostsForUser(@PathVariable Long userId) {
-
-		Sort sort = new Sort(Sort.Direction.DESC, "created");
-		// NOTE: mapping over this list twice may not be optimal for performance. However, keeping this simple for now.
-		List<Resource<PostDetailDto>> userPosts = postService.findAllByAuthor(userId, sort).stream().map(entity -> convertToDto(entity)).map(postAssembler::toResource)
-				.collect(Collectors.toList());
-		return new Resources<>(userPosts, linkTo(methodOn(UserController.class).findAllPostsForUser(userId)).withSelfRel());
-	}
-
-	private UserDetailDto convertToDto(User entity) {
-		UserDetailDto dto = modelMapper.map(entity, UserDetailDto.class);
-	    return dto;
-	}
-	
-	private User convertToEntity(UserCreateDto dto) throws ParseException {
-		User entity = modelMapper.map(dto, User.class);
-		return entity;
-	}
-	
-	private PostDetailDto convertToDto(Post entity) {
-		PostDetailDto dto = modelMapper.map(entity, PostDetailDto.class);
-		return dto;
-	}
+		return userAssembler.toResource(this.userMapper.convertToDto(user));
+	}	
 }

@@ -66,9 +66,37 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
             /*Starting custom code*/
-//            .antMatchers(HttpMethod.GET, "/login").permitAll()
-            .antMatchers("/users/**").permitAll()
-            .antMatchers("/posts/**").permitAll()
+//            .antMatchers(HttpMethod.GET, "/users").permitAll()
+            .antMatchers(HttpMethod.GET, "/users/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/comments/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/users/*/posts").permitAll()
+            .antMatchers(HttpMethod.GET, "/posts/**").permitAll()
+            .antMatchers(HttpMethod.POST, "/users").permitAll()
+            
+            // POSTs to be authenticated
+            // These are not needed because of the aggressive GET match
+//            .antMatchers(HttpMethod.POST, "/posts").authenticated()
+//            .antMatchers(HttpMethod.POST, "/users/**/comments").authenticated()
+            
+            // Other endpoints are enabled for authenticated user. However, this should be Role based.
+//            .antMatchers(HttpMethod.GET, "/actuator/**").denyAll() 
+            
+            /**
+             * Doesn't do much at this point. 
+             * But we could easily extend this to add health checks for dependent services
+             * */
+            .antMatchers(HttpMethod.GET, "/actuator/health").permitAll() 
+            
+	          /**
+	           * Auditing endpoints could be enabled based on user role. (Not implemented as there is no notion of ROLE)
+	           */
+//            .antMatchers(HttpMethod.GET, "/actuator/**").hasRole("ADMIN") 
+
+            /* Enable swagger for all users*/
+            .antMatchers("/v2/api-docs/**").permitAll()
+            .antMatchers("/swagger-ui/**").permitAll()
+            .antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**").permitAll()
+            
             .anyRequest().authenticated();
 
        httpSecurity

@@ -4,24 +4,19 @@ import java.io.Serializable;
 
 import com.blogosphere.blog.dto.UserDetailDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor 
+@NoArgsConstructor // ObjectMapper needs this
+@Getter
 public class JwtTokenResponse implements Serializable {
 
 	private static final long serialVersionUID = 8317676219297719109L;
 
-	private final String token;
-
-	private final UserDetailDto user;
-
-	public JwtTokenResponse(UserDetailDto user, String token) {
-		this.token = token;
-		this.user = user;
-	}
-
-	public String getToken() {
-		return this.token;
-	}
-	
-	public UserDetailDto getUser() {
-		return user;
-	}
+	private String token;
+	private UserDetailDto user;
 }

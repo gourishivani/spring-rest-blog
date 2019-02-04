@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.blogosphere.blog.dao.UserRepository;
 import com.blogosphere.blog.model.User;
 
 public interface UserService {
@@ -22,5 +23,4 @@ public interface UserService {
 	public Optional<User> find(Long id);
 	
 	public User findByEmail(String email);
-	
 }

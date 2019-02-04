@@ -6,9 +6,12 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -18,9 +21,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data 
@@ -28,6 +33,9 @@ import lombok.ToString;
 @Entity
 @ToString(callSuper = true)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Table(name = "post")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Post extends BaseEntity {
 	
 	@Column(nullable=false, length = 30)
@@ -44,7 +52,7 @@ public class Post extends BaseEntity {
 	private String description;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional=false)
-	@JoinColumn(name="author_id", referencedColumnName="id")
+	@JoinColumn(foreignKey=@ForeignKey(name="FK_post_author_id"), name="author_id", referencedColumnName="id")
 	private User author;
 	
 //	@Getter(AccessLevel.NONE)
